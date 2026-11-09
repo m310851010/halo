@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{layout :: html(head = null, content = ~{::content})}">
+<th:block th:fragment="content">
+  <ol class="breadcrumb">
+    <li><a th:href="@{${site.routes.categoriesUri}}">分类</a></li>
+    <li class="active" th:text="${category.spec.displayName}"></li>
+  </ol>
+  <div class="panel panel-default" th:each="post : ${posts.items}">
+    <div class="panel-body">
+      <h2 class="theme-post-title">
+        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
+      </h2>
+      <p class="text-muted">
+        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+        <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd HH:mm')}"></time>
+      </p>
+      <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
+    </div>
+  </div>
+  <nav class="text-center" aria-label="分页">
+    <ul class="pagination">
+      <li th:if="${posts.hasPrevious()}">
+        <a th:href="@{${posts.prevUrl}}">&laquo; 上一页</a>
+      </li>
+      <li class="disabled" th:unless="${posts.hasPrevious()}">
+        <span>&laquo; 上一页</span>
+      </li>
+      <li th:if="${posts.hasNext()}">
+        <a th:href="@{${posts.nextUrl}}">下一页 &raquo;</a>
+      </li>
+      <li class="disabled" th:unless="${posts.hasNext()}">
+        <span>下一页 &raquo;</span>
+      </li>
+    </ul>
+  </nav>
+</th:block>
+</html>

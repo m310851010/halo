@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{layout :: html(head = null, content = ~{::content})}">
+<th:block th:fragment="content">
+  <div class="panel panel-default">
+    <div class="panel-heading">文章归档</div>
+    <div class="panel-body">
+      <th:block th:each="archive : ${archives.items}">
+        <h3>
+          <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+          <span th:text="${archive.year}"></span> 年
+        </h3>
+        <ul class="list-group theme-archive-list">
+          <th:block th:each="month : ${archive.months}">
+            <li class="list-group-item" th:each="post : ${month.posts}">
+              <span class="text-muted theme-month"
+                    th:text="${month.month} + ' 月'"></span>
+              <a th:href="@{${post.status.permalink}}"
+                 th:title="${post.spec.title}"
+                 th:text="${post.spec.title}"></a>
+            </li>
+          </th:block>
+        </ul>
+      </th:block>
+    </div>
+    <div class="panel-footer text-center">
+      <ul class="pagination theme-pagination-none">
+        <li th:if="${archives.hasPrevious()}">
+          <a th:href="@{${archives.prevUrl}}">&laquo; 上一页</a>
+        </li>
+        <li class="disabled" th:unless="${archives.hasPrevious()}">
+          <span>&laquo; 上一页</span>
+        </li>
+        <li th:if="${archives.hasNext()}">
+          <a th:href="@{${archives.nextUrl}}">下一页 &raquo;</a>
+        </li>
+        <li class="disabled" th:unless="${archives.hasNext()}">
+          <span>下一页 &raquo;</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</th:block>
+</html>

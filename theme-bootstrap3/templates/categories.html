@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{layout :: html(head = null, content = ~{::content})}">
+<th:block th:fragment="content">
+  <div class="panel panel-default">
+    <div class="panel-heading">分类目录</div>
+    <div class="panel-body">
+      <div class="list-group">
+        <a class="list-group-item"
+           th:each="category : ${categories}"
+           th:href="@{${category.status.permalink}}">
+          <span class="badge" th:text="${category.postCount}"></span>
+          <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+          <span th:text="${category.spec.displayName}"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>

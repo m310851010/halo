@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{layout :: html(head = null, content = ~{::content})}">
+<th:block th:fragment="content">
+  <div class="panel panel-default">
+    <div class="panel-heading">标签</div>
+    <div class="panel-body">
+      <a class="label label-primary theme-label theme-tag-cloud"
+         th:each="tag : ${tags}"
+         th:href="@{${tag.status.permalink}}"
+         th:text="${tag.spec.displayName}"></a>
+      <p class="text-muted" th:if="${#lists.isEmpty(tags)}">还没有任何标签。</p>
+    </div>
+  </div>
+</th:block>
+</html>

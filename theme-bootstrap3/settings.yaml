@@ -1,0 +1,30 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: theme-bootstrap3-setting
+spec:
+  forms:
+    - group: general
+      label: 通用
+      formSchema:
+        - $formkit: text
+          name: footer_text
+          label: 页脚文字
+          placeholder: 支持任意 HTML
+          value: "由 <a href=\"https://www.halo.run\">Halo</a> 强力驱动"
+        - $formkit: checkbox
+          name: show_comment
+          label: 在文章底部显示评论区
+          value: true
+    - group: header
+      label: 顶部导航
+      formSchema:
+        - $formkit: select
+          name: navbar_style
+          label: 导航栏风格
+          value: navbar-inverse
+          options:
+            - label: 深色（反色）
+              value: navbar-inverse
+            - label: 浅色（默认）
+              value: navbar-default

@@ -1,0 +1,21 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: theme-bootstrap3
+spec:
+  displayName: Bootstrap 3 经典风
+  author:
+    name: m310851010
+    website: https://github.com/m310851010
+  description: 基于 Bootstrap 3.4.1 的经典博客主题，兼容 Halo 2.x，无需构建工具，开箱即用。
+  logo: ""
+  website: ""
+  repo: ""
+  issues: ""
+  settingName: theme-bootstrap3-setting
+  configMapName: theme-bootstrap3-configMap
+  version: 1.0.0
+  requires: ">=2.0.0"
+  license:
+    - name: GPL-3.0
+      url: https://www.gnu.org/licenses/gpl-3.0.html

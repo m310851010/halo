@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{layout :: html(head = null, content = ~{::content})}">
+<th:block th:fragment="content">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h1 class="theme-post-title" th:text="${singlePage.spec.title}"></h1>
+      <hr/>
+      <article class="theme-content" th:utext="${singlePage.content.content}"></article>
+    </div>
+  </div>
+</th:block>
+</html>
