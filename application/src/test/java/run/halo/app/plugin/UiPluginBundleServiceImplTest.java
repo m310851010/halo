@@ -83,7 +83,7 @@ class UiPluginBundleServiceImplTest {
                 .containsExactly(tuple("legacy-plugin", "plugin", "legacy"), tuple("theme:active", "theme", "legacy"));
         assertThat(descriptor.legacyScript())
                 .isEqualTo("/apis/api.console.halo.run/v1alpha1/ui-plugins/-/bundle.js?v=" + bundleVersion);
-        assertVersionedUrl(descriptor.providers().getFirst().style(), "/plugins/legacy-plugin/assets/ui/style.css");
+        assertVersionedUrl(descriptor.providers().get(0).style(), "/plugins/legacy-plugin/assets/ui/style.css");
         assertVersionedUrl(descriptor.providers().get(1).style(), "/themes/active/ui-plugin/assets/style.css");
 
         assertThat(read(service.getJsBundle(bundleVersion).block()))
@@ -143,12 +143,12 @@ class UiPluginBundleServiceImplTest {
                         tuple("ui-plugin", "plugin", "esm"),
                         tuple("theme:active", "theme", "esm"));
         assertThat(descriptor.legacyScript()).isNull();
-        assertThat(descriptor.providers().getFirst().entry())
+        assertThat(descriptor.providers().get(0).entry())
                 .isEqualTo("/plugins/console-plugin/assets/console/main.abcdef12.js");
         assertThat(descriptor.providers().get(1).entry()).isEqualTo("/plugins/ui-plugin/assets/ui/main.12345678.js");
         assertThat(descriptor.providers().get(2).entry())
                 .isEqualTo("/themes/active/ui-plugin/assets/chunks/main.87654321.js");
-        assertThat(descriptor.providers().getFirst().style()).isNull();
+        assertThat(descriptor.providers().get(0).style()).isNull();
         assertThat(descriptor.providers().get(1).style())
                 .isEqualTo("/plugins/ui-plugin/assets/ui/styles/main.12345678.css");
         assertThat(descriptor.providers().get(2).style())
@@ -265,8 +265,8 @@ class UiPluginBundleServiceImplTest {
         var second = service.getProviderDescriptor().block();
         var secondVersion = generateBundleVersion();
 
-        assertThat(second.providers().getFirst().entry())
-                .isNotEqualTo(first.providers().getFirst().entry());
+        assertThat(second.providers().get(0).entry())
+                .isNotEqualTo(first.providers().get(0).entry());
         assertThat(secondVersion).isNotEqualTo(firstVersion);
     }
 
@@ -293,8 +293,8 @@ class UiPluginBundleServiceImplTest {
                 "{\"format\":\"esm\",\"entry\":\"./main.22222222.js\"}");
         var second = service.getProviderDescriptor().block();
 
-        assertThat(second.providers().getFirst().entry())
-                .isNotEqualTo(first.providers().getFirst().entry());
+        assertThat(second.providers().get(0).entry())
+                .isNotEqualTo(first.providers().get(0).entry());
         assertThat(second.providers().get(1).entry())
                 .isEqualTo(first.providers().get(1).entry());
     }
@@ -314,7 +314,7 @@ class UiPluginBundleServiceImplTest {
                 .contains("\"name\":\"theme:active\"")
                 .doesNotContain("inactive");
         assertThat(read(service.getCssBundle(bundleVersion).block()))
-                .isEqualTo("@import url(\"" + descriptor.providers().getFirst().style() + "\");\n");
+                .isEqualTo("@import url(\"" + descriptor.providers().get(0).style() + "\");\n");
     }
 
     @Test

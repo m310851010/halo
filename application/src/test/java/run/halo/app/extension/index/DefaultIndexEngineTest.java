@@ -143,8 +143,8 @@ class DefaultIndexEngineTest {
         var result = engine.retrieve(Fake.class, options, page);
         assertEquals(1001, result.getTotal());
         assertEquals(1000, result.getItems().size());
-        assertEquals("0001", result.getItems().getFirst());
-        assertEquals("1000", result.getItems().getLast());
+        assertEquals("0001", result.getItems().get(0));
+        assertEquals("1000", result.getItems().get(result.getItems().size() - 1));
     }
 
     @Test

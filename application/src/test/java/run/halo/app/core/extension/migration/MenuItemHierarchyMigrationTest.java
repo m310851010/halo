@@ -172,7 +172,7 @@ class MenuItemHierarchyMigrationTest {
                 menu("menu-a", children("shared"), "2022-08-05T04:19:37Z"),
                 menu("menu-b", children("shared"), "2022-08-05T04:19:38Z"));
         migration.migrate(menus, List.of(shared)).block();
-        var clone = createdItems.getFirst();
+        var clone = createdItems.get(0);
         clone.getSpec().setMenuName(null);
 
         StepVerifier.create(migration.migrate(menus, List.of(shared, clone)))

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>run.halo.app</groupId>
+        <artifactId>halo</artifactId>
+        <version>2.28.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>application</artifactId>
+    <packaging>jar</packaging>
+
+    <name>halo</name>
+    <description>Halo application.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>run.halo.app</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>name.nkonev.r2dbc-migrate</groupId>
+            <artifactId>r2dbc-migrate-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.therapi</groupId>
+            <artifactId>therapi-runtime-javadoc-scribe</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.therapi</groupId>
+            <artifactId>therapi-runtime-javadoc</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webtestclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- webjars -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>jsencrypt</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>normalize.css</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Ensure the ui module (and its pnpm build) runs first in the reactor. -->
+        <dependency>
+            <groupId>run.halo.app</groupId>
+            <artifactId>ui</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>halo-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-git-properties</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <dotGitDirectory>${maven.multiModuleProjectDirectory}/.git</dotGitDirectory>
+                            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Download preset plugins, mirrors the original downloadPluginPresets task. -->
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-plugin-comment-widget</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-comment-widget/releases/download/v3.3.2/plugin-comment-widget-3.3.2.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-comment-widget.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-search-widget</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-search-widget/releases/download/v1.7.1/plugin-search-widget-1.7.1.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-search-widget.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-sitemap</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-sitemap/releases/download/v1.3.0/plugin-sitemap-1.3.0.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-sitemap.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-feed</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-feed/releases/download/v1.5.0/plugin-feed-1.5.0.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-feed.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-shiki</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-sigs/plugin-shiki/releases/download/v1.5.1/plugin-shiki-1.5.1.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-shiki.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-editor-hyperlink-card</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-sigs/plugin-editor-hyperlink-card/releases/download/v1.9.2/plugin-editor-hyperlink-card-1.9.2.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-editor-hyperlink-card.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-ai-foundation</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-ai-foundation/releases/download/v1.1.1/plugin-ai-foundation-1.1.1.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-ai-foundation.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-ai-page-builder</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-ai-page-builder/releases/download/v1.1.0/plugin-ai-page-builder-1.1.0.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-ai-page-builder.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-plugin-mcp-server</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://github.com/halo-dev/plugin-mcp-server/releases/download/v1.3.1/plugin-mcp-server-1.3.1.jar</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>plugin-mcp-server.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                    <!-- Currently, plugin-app-store is not open source, so we need to download
+                         it from the official website.
+                         Please see https://github.com/halo-dev/plugin_app_store/issues/55
+                         https://www.halo.run/store/apps/app-VYJbF/releases/app-release-qafgml3o -->
+                    <execution>
+                        <id>download-plugin-appstore</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://www.halo.run/store/apps/app-VYJbF/releases/download/app-release-dtqssqka/assets/app-release-dtqssqka-sxbvffrr</url>
+                            <outputDirectory>${project.build.outputDirectory}/presets/plugins</outputDirectory>
+                            <outputFileName>appstore.jar</outputFileName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-presets-json</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo file="${project.build.outputDirectory}/presets/plugins/presets.json"
+                                      encoding="UTF-8">{
+  "plugin-comment-widget.jar": {
+    "autoEnable": true
+  },
+  "plugin-search-widget.jar": {
+    "autoEnable": true
+  },
+  "plugin-sitemap.jar": {
+    "autoEnable": true
+  },
+  "plugin-feed.jar": {
+    "autoEnable": true
+  },
+  "plugin-shiki.jar": {
+    "autoEnable": true
+  },
+  "plugin-editor-hyperlink-card.jar": {
+    "autoEnable": true
+  },
+  "plugin-ai-foundation.jar": {
+    "autoEnable": true
+  },
+  "plugin-ai-page-builder.jar": {
+    "autoEnable": true
+  },
+  "plugin-mcp-server.jar": {
+    "autoEnable": true
+  },
+  "appstore.jar": {
+    "autoEnable": true
+  }
+}</echo>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copy the built ui dist into classes, mirrors the original copyUiDist task. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-ui-dist</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${maven.multiModuleProjectDirectory}/ui/build/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <artifact>halo</artifact>
+                                <name>halo</name>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xmx1g</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

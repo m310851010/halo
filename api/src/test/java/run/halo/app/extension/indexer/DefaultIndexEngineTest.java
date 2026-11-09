@@ -20,7 +20,7 @@ class DefaultIndexEngineTest {
         });
         var result = new ArrayList<>();
         while (!pq.isEmpty()) {
-            result.addFirst(pq.poll());
+            result.add(0, pq.poll());
         }
         result.forEach(System.out::println);
     }

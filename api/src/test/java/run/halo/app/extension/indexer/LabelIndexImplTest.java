@@ -15,6 +15,6 @@ class LabelIndexImplTest {
         map.put("b@d", "4");
 
         var subMap = map.subMap("a@", "a@" + Character.MAX_VALUE);
-        subMap.sequencedKeySet().forEach(System.out::println);
+        subMap.descendingKeySet().forEach(System.out::println);
     }
 }

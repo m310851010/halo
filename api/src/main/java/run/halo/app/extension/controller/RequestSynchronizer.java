@@ -62,7 +62,7 @@ public class RequestSynchronizer implements Synchronizer<Request> {
             var names = client.listTopNames(type, listOptions, sort, batchSize);
             names.forEach(name -> watcher.onAdd(new Request(name)));
             while (names.size() == batchSize) {
-                var lastName = names.getLast();
+                var lastName = names.get(names.size() - 1);
                 var augmentedOptions = ListOptions.builder(listOptions)
                         .andQuery(Queries.greaterThan("metadata.name", lastName))
                         .build();

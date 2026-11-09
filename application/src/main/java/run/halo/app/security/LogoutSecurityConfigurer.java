@@ -64,7 +64,7 @@ class LogoutSecurityConfigurer implements SecurityConfigurer {
         logoutHandlers.add(defaultLogoutHandler);
         applicationContext.getBeanProvider(ServerLogoutHandler.class).forEach(logoutHandlers::add);
         if (logoutHandlers.size() == 1) {
-            return logoutHandlers.getFirst();
+            return logoutHandlers.get(0);
         }
         return new DelegatingServerLogoutHandler(logoutHandlers);
     }

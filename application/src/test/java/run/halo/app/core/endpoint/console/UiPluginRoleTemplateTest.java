@@ -18,7 +18,7 @@ class UiPluginRoleTemplateTest {
     @Test
     void shouldAllowAuthenticatedUsersToFetchUiPluginProviders() {
         var resource = new ClassPathResource("extensions/role-template-authenticated.yaml");
-        var authenticated = new YamlUnstructuredLoader(resource).load().getFirst();
+        var authenticated = new YamlUnstructuredLoader(resource).load().get(0);
         var metadata = Objects.requireNonNull(authenticated.getMetadata());
         assertThat(metadata.getName()).isEqualTo("authenticated");
         var role = Unstructured.OBJECT_MAPPER.convertValue(authenticated.getData(), Role.class);

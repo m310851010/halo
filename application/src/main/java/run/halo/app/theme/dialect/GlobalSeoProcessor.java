@@ -39,7 +39,7 @@ class GlobalSeoProcessor implements TemplateHeadProcessor {
                 .doOnNext(seo -> {
                     IModelFactory modelFactory = context.getModelFactory();
                     if (Boolean.TRUE.equals(seo.getBlockSpiders())) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                        var attributes = new LinkedHashMap<String, String>(2);
                         attributes.put("name", "robots");
                         attributes.put("content", "noindex");
                         var metaTag = modelFactory.createStandaloneElementTag(
@@ -49,7 +49,7 @@ class GlobalSeoProcessor implements TemplateHeadProcessor {
                     }
                     var seoMetaDescription = context.getVariable(META_DESCRIPTION_VARIABLE_NAME);
                     if (seoMetaDescription instanceof String description && !description.isBlank()) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                        var attributes = new LinkedHashMap<String, String>(2);
                         attributes.put("name", "description");
                         attributes.put("content", HtmlUtils.htmlEscape(description));
                         var metaTag = modelFactory.createStandaloneElementTag(

@@ -128,7 +128,8 @@ class CommentPermalinkIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        for (var extension : created.reversed()) {
+        for (var i = created.size() - 1; i >= 0; i--) {
+            var extension = created.get(i);
             var name = ExtensionStoreUtil.buildStoreName(
                     schemeManager.get(extension.getClass()),
                     extension.getMetadata().getName());
@@ -721,7 +722,7 @@ class CommentPermalinkIntegrationTest {
                         .list(null, 1, 10)
                         .block()
                         .getItems()
-                        .getFirst()
+                        .get(0)
                         .getPermalink())
                 .isEqualTo(COMMENT_URL);
         http.get()

@@ -58,7 +58,7 @@ class DefaultIndicesInitializer implements IndicesInitializer {
             indexEngine.insert(
                     extensionStores.stream().map(es -> this.extensionConverter.convertFrom(type, es))::iterator);
             if (!extensionStores.isEmpty()) {
-                nameCursor = extensionStores.getLast().getName();
+                nameCursor = extensionStores.get(extensionStores.size() - 1).getName();
             }
             indexedCount += extensionStores.size();
             watch.stop();

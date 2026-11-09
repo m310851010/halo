@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>run.halo.app</groupId>
+        <artifactId>halo</artifactId>
+        <version>2.28.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ui</artifactId>
+    <packaging>pom</packaging>
+
+    <name>UI</name>
+    <description>Console and user center front-end, built with pnpm.</description>
+
+    <properties>
+        <node.version>v24.11.0</node.version>
+        <pnpm.version>12.4.2</pnpm.version>
+        <npm.registry>https://registry.npmmirror.com</npm.registry>
+        <node.dir>${project.build.directory}/node</node.dir>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Install a pinned Node.js runtime; pnpm is fetched directly as a tarball
+                 because frontend-maven-plugin's install-node-and-pnpm goal cannot link
+                 the new pnpm package layout. -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install-node</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <installDirectory>${project.build.directory}</installDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-pnpm-and-install</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <get src="${npm.registry}/pnpm/-/pnpm-${pnpm.version}.tgz"
+                                     dest="${project.build.directory}/pnpm-${pnpm.version}.tgz"/>
+                                <untar src="${project.build.directory}/pnpm-${pnpm.version}.tgz"
+                                       dest="${project.build.directory}/pnpm-tmp"
+                                       compression="gzip"/>
+                                <delete dir="${node.dir}/node_modules/pnpm"/>
+                                <move todir="${node.dir}/node_modules/pnpm">
+                                    <fileset dir="${project.build.directory}/pnpm-tmp/package"/>
+                                </move>
+                                <exec executable="${node.dir}/node.exe" dir="${project.basedir}"
+                                      failonerror="true">
+                                    <arg value="${node.dir}/node_modules/pnpm/bin/pnpm.mjs"/>
+                                    <arg value="install"/>
+                                    <env key="npm_config_registry" value="${npm.registry}"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pnpm-build</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec executable="${node.dir}/node.exe" dir="${project.basedir}"
+                                      failonerror="true">
+                                    <arg value="${node.dir}/node_modules/pnpm/bin/pnpm.mjs"/>
+                                    <arg value="run"/>
+                                    <arg value="build"/>
+                                    <env key="npm_config_registry" value="${npm.registry}"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

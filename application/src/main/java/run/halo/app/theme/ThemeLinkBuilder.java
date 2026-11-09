@@ -90,7 +90,10 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             return false;
         }
         var pathSegments = uri.getPathSegments();
-        var lastSegment = pathSegments.getLast();
+        if (pathSegments.isEmpty()) {
+            return false;
+        }
+        var lastSegment = pathSegments.get(pathSegments.size() - 1);
         // If the last segment has no dot, treat it as a directory path
         return StringUtils.isNotBlank(lastSegment) && !lastSegment.contains(".");
     }

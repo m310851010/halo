@@ -32,7 +32,7 @@ public class DefaultFaviconHeadProcessor implements TemplateHeadProcessor {
                 .filter(basic -> StringUtils.isNotBlank(basic.getFavicon()))
                 .doOnNext(basic -> {
                     IModelFactory modelFactory = context.getModelFactory();
-                    var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                    var attributes = new LinkedHashMap<String, String>(2);
                     attributes.put("rel", "icon");
                     attributes.put("href", HtmlUtils.htmlEscape(basic.getFavicon()));
                     var linkTag = modelFactory.createStandaloneElementTag(

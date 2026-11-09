@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.ThumbnailParameter;
 import net.coobird.thumbnailator.Thumbnails;
@@ -59,9 +60,14 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
         if (concurrentThreads == null || concurrentThreads < 1) {
             concurrentThreads = DEFAULT_GENERATION_CONCURRENT_THREADS;
         }
+        var threadCounter = new AtomicInteger(0);
         this.executorService = Executors.newFixedThreadPool(
                 concurrentThreads,
-                Thread.ofPlatform().daemon().name("thumbnail-generator-", 0).factory());
+                task -> {
+                    var thread = new Thread(task, "thumbnail-generator-" + threadCounter.getAndIncrement());
+                    thread.setDaemon(true);
+                    return thread;
+                });
         this.inProgress = new ConcurrentHashMap<>();
     }
 
@@ -70,8 +76,16 @@ class DefaultLocalThumbnailService implements LocalThumbnailService, DisposableB
     }
 
     @Override
-    public void destroy() throws Exception {
-        this.executorService.close();
+    public void destroy() {
+        this.executorService.shutdown();
+        try {
+            if (!this.executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+                this.executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            this.executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override

@@ -39,7 +39,7 @@ class IndexSeoProcessor implements TemplateHeadProcessor {
 
                     String keywords = seo.getKeywords();
                     if (StringUtils.isNotBlank(keywords)) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                        var attributes = new LinkedHashMap<String, String>(2);
                         attributes.put("name", "keywords");
                         attributes.put("content", HtmlUtils.htmlEscape(keywords));
                         model.add(modelFactory.createStandaloneElementTag(
@@ -48,7 +48,7 @@ class IndexSeoProcessor implements TemplateHeadProcessor {
                     }
 
                     if (StringUtils.isNotBlank(seo.getDescription())) {
-                        var attributes = LinkedHashMap.<String, String>newLinkedHashMap(2);
+                        var attributes = new LinkedHashMap<String, String>(2);
                         attributes.put("name", "description");
                         attributes.put("content", HtmlUtils.htmlEscape(seo.getDescription()));
                         model.add(modelFactory.createStandaloneElementTag(

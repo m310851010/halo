@@ -55,96 +55,108 @@ public class QueryVisitor<E extends Extension> implements Visitor {
 
         @Override
         public void enter(Visitable segment) {
-            switch (segment) {
-                case And(var left, var right) ->
-                    // delegate to AndCondition for backward compatibility
-                    new AndCondition(left, right).visit(this);
-                case EmptyCondition ignored -> result.addAll(allQuery("metadata.name", false));
-                case AndCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    left.visit(this);
-                    // fail fast if left result is empty
-                    if (!result.isEmpty()) {
-                        var rightVisitor = new ConditionVisitor();
-                        right.visit(rightVisitor);
-                        result.retainAll(rightVisitor.getResult());
-                    }
+            if (segment instanceof And and) {
+                var left = and.left();
+                var right = and.right();
+                // delegate to AndCondition for backward compatibility
+                new AndCondition(left, right).visit(this);
+            } else if (segment instanceof EmptyCondition) {
+                result.addAll(allQuery("metadata.name", false));
+            } else if (segment instanceof AndCondition andCondition) {
+                var left = andCondition.left();
+                var right = andCondition.right();
+                if (left instanceof EmptyCondition) {
+                    right.visit(this);
+                    return;
                 }
-                case OrCondition(var left, var right) -> {
-                    if (left instanceof EmptyCondition) {
-                        left.visit(this);
-                        return;
-                    }
-                    if (right instanceof EmptyCondition) {
-                        right.visit(this);
-                        return;
-                    }
+                if (right instanceof EmptyCondition) {
                     left.visit(this);
+                    return;
+                }
+                left.visit(this);
+                // fail fast if left result is empty
+                if (!result.isEmpty()) {
                     var rightVisitor = new ConditionVisitor();
                     right.visit(rightVisitor);
-                    result.addAll(rightVisitor.getResult());
+                    result.retainAll(rightVisitor.getResult());
                 }
-                case NotCondition(var condition) -> {
-                    if (condition instanceof EmptyCondition) {
-                        return;
-                    }
-                    condition.not().visit(this);
+            } else if (segment instanceof OrCondition orCondition) {
+                var left = orCondition.left();
+                var right = orCondition.right();
+                if (left instanceof EmptyCondition) {
+                    left.visit(this);
+                    return;
                 }
-                case EqualCondition(var indexName, var key) -> result.addAll(equalQuery(indexName, key, false));
-                case NotEqualCondition(var indexName, var key) -> result.addAll(equalQuery(indexName, key, true));
-                case InCondition(var indexName, var keys) -> result.addAll(inQuery(indexName, keys, false));
-                case NotInCondition(var indexName, var keys) -> result.addAll(inQuery(indexName, keys, true));
-                case LessThanCondition(var indexName, var upperBound, var inclusive) ->
-                    result.addAll(lessThanQuery(indexName, upperBound, inclusive, false));
-                case GreaterThanCondition(var indexName, var lowerBound, var inclusive) ->
-                    result.addAll(lessThanQuery(indexName, lowerBound, inclusive, true));
-                case BetweenCondition bc ->
-                    result.addAll(betweenQuery(
-                            bc.indexName(), bc.fromKey(), bc.fromInclusive(), bc.toKey(), bc.toInclusive(), false));
-                case NotBetweenCondition nbc ->
-                    result.addAll(betweenQuery(
-                            nbc.indexName(), nbc.fromKey(), nbc.fromInclusive(), nbc.toKey(), nbc.toInclusive(), true));
-                case IsNullCondition(var indexName) -> result.addAll(isNullQuery(indexName, false));
-                case IsNotNullCondition(var indexName) -> result.addAll(isNullQuery(indexName, true));
-                case StringContainsCondition(var indexName, var keyword) ->
-                    result.addAll(stringContainsQuery(indexName, keyword, false));
-                case StringNotContainsCondition(var indexName, var keyword) ->
-                    result.addAll(stringContainsQuery(indexName, keyword, true));
-                case StringStartsWithCondition(var indexName, var prefix) ->
-                    result.addAll(stringStartsWithQuery(indexName, prefix, false));
-                case StringNotStartsWithCondition(var indexName, var prefix) ->
-                    result.addAll(stringStartsWithQuery(indexName, prefix, true));
-                case StringEndsWithCondition(var indexName, var suffix) ->
-                    result.addAll(stringEndsWithQuery(indexName, suffix, false));
-                case StringNotEndsWithCondition(var indexName, var suffix) ->
-                    result.addAll(stringEndsWithQuery(indexName, suffix, true));
-                case AllCondition(var indexName) -> result.addAll(allQuery(indexName, false));
-                case NoneCondition(var indexName) -> result.addAll(allQuery(indexName, true));
-                case LabelExistsCondition(var labelKey) -> result.addAll(labelExistsQuery(labelKey));
-                case LabelNotExistsCondition(var labelKey) -> {
-                    // To get all extensions that do not have the label, we get all extensions
-                    result.addAll(allQuery("metadata.name", false));
-                    result.removeAll(labelExistsQuery(labelKey));
+                if (right instanceof EmptyCondition) {
+                    right.visit(this);
+                    return;
                 }
-                case LabelEqualsCondition(var labelKey, var labelValue) ->
-                    result.addAll(labelEqualsQuery(labelKey, labelValue, false));
-                case LabelNotEqualsCondition(var labelKey, var labelValue) -> {
-                    // Only for backward compatibility
-                    result.addAll(allQuery("metadata.name", false));
-                    result.removeAll(labelEqualsQuery(labelKey, labelValue, false));
+                left.visit(this);
+                var rightVisitor = new ConditionVisitor();
+                right.visit(rightVisitor);
+                result.addAll(rightVisitor.getResult());
+            } else if (segment instanceof NotCondition notCondition) {
+                var condition = notCondition.condition();
+                if (condition instanceof EmptyCondition) {
+                    return;
                 }
-                case LabelInCondition(var labelKey, var labelValues) ->
-                    result.addAll(labelInQuery(labelKey, labelValues, false));
-                case LabelNotInCondition(var labelKey, var labelValues) ->
-                    result.addAll(labelInQuery(labelKey, labelValues, true));
-                default -> {}
+                condition.not().visit(this);
+            } else if (segment instanceof EqualCondition condition) {
+                result.addAll(equalQuery(condition.indexName(), condition.key(), false));
+            } else if (segment instanceof NotEqualCondition condition) {
+                result.addAll(equalQuery(condition.indexName(), condition.key(), true));
+            } else if (segment instanceof InCondition condition) {
+                result.addAll(inQuery(condition.indexName(), condition.keys(), false));
+            } else if (segment instanceof NotInCondition condition) {
+                result.addAll(inQuery(condition.indexName(), condition.keys(), true));
+            } else if (segment instanceof LessThanCondition condition) {
+                result.addAll(lessThanQuery(condition.indexName(), condition.upperBound(), condition.inclusive(),
+                    false));
+            } else if (segment instanceof GreaterThanCondition condition) {
+                result.addAll(lessThanQuery(condition.indexName(), condition.lowerBound(), condition.inclusive(),
+                    true));
+            } else if (segment instanceof BetweenCondition bc) {
+                result.addAll(betweenQuery(bc.indexName(), bc.fromKey(), bc.fromInclusive(), bc.toKey(),
+                    bc.toInclusive(), false));
+            } else if (segment instanceof NotBetweenCondition nbc) {
+                result.addAll(betweenQuery(nbc.indexName(), nbc.fromKey(), nbc.fromInclusive(), nbc.toKey(),
+                    nbc.toInclusive(), true));
+            } else if (segment instanceof IsNullCondition condition) {
+                result.addAll(isNullQuery(condition.indexName(), false));
+            } else if (segment instanceof IsNotNullCondition condition) {
+                result.addAll(isNullQuery(condition.indexName(), true));
+            } else if (segment instanceof StringContainsCondition condition) {
+                result.addAll(stringContainsQuery(condition.indexName(), condition.keyword(), false));
+            } else if (segment instanceof StringNotContainsCondition condition) {
+                result.addAll(stringContainsQuery(condition.indexName(), condition.keyword(), true));
+            } else if (segment instanceof StringStartsWithCondition condition) {
+                result.addAll(stringStartsWithQuery(condition.indexName(), condition.prefix(), false));
+            } else if (segment instanceof StringNotStartsWithCondition condition) {
+                result.addAll(stringStartsWithQuery(condition.indexName(), condition.prefix(), true));
+            } else if (segment instanceof StringEndsWithCondition condition) {
+                result.addAll(stringEndsWithQuery(condition.indexName(), condition.suffix(), false));
+            } else if (segment instanceof StringNotEndsWithCondition condition) {
+                result.addAll(stringEndsWithQuery(condition.indexName(), condition.suffix(), true));
+            } else if (segment instanceof AllCondition condition) {
+                result.addAll(allQuery(condition.indexName(), false));
+            } else if (segment instanceof NoneCondition condition) {
+                result.addAll(allQuery(condition.indexName(), true));
+            } else if (segment instanceof LabelExistsCondition condition) {
+                result.addAll(labelExistsQuery(condition.labelKey()));
+            } else if (segment instanceof LabelNotExistsCondition condition) {
+                // To get all extensions that do not have the label, we get all extensions
+                result.addAll(allQuery("metadata.name", false));
+                result.removeAll(labelExistsQuery(condition.labelKey()));
+            } else if (segment instanceof LabelEqualsCondition condition) {
+                result.addAll(labelEqualsQuery(condition.labelKey(), condition.labelValue(), false));
+            } else if (segment instanceof LabelNotEqualsCondition condition) {
+                // Only for backward compatibility
+                result.addAll(allQuery("metadata.name", false));
+                result.removeAll(labelEqualsQuery(condition.labelKey(), condition.labelValue(), false));
+            } else if (segment instanceof LabelInCondition condition) {
+                result.addAll(labelInQuery(condition.labelKey(), condition.labelValues(), false));
+            } else if (segment instanceof LabelNotInCondition condition) {
+                result.addAll(labelInQuery(condition.labelKey(), condition.labelValues(), true));
             }
         }
 

@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -113,10 +112,13 @@ public class DefaultController<R> implements Controller {
     }
 
     private static Executor executor(String name) {
-        return Executors.newThreadPerTaskExecutor(Thread.ofVirtual()
-                .name(name, 1)
-                .uncaughtExceptionHandler((t, e) -> log.error("Uncaught exception in thread: {}", t.getName(), e))
-                .factory());
+        var threadCounter = new AtomicLong(1);
+        return task -> {
+            var thread = new Thread(task, name + "-" + threadCounter.getAndIncrement());
+            thread.setUncaughtExceptionHandler(
+                    (t, e) -> log.error("Uncaught exception in thread: {}", t.getName(), e));
+            thread.start();
+        };
     }
 
     @Override
