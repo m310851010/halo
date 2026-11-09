@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -438,13 +439,20 @@ class CategoryFinderImplTest {
         return List.of(category2, category(), category3);
     }
 
+    /**
+     * Sequence number to keep creation timestamps of fake categories strictly increasing.
+     * {@link Instant#now()} may return identical values within the same clock tick (e.g. on
+     * Windows), which would break order-sensitive tree assertions.
+     */
+    private final AtomicLong categorySeq = new AtomicLong();
+
     private Category category() {
         final Category category = new Category();
 
         Metadata metadata = new Metadata();
         metadata.setName("hello");
         metadata.setAnnotations(Map.of("K1", "V1"));
-        metadata.setCreationTimestamp(Instant.now());
+        metadata.setCreationTimestamp(Instant.now().plusNanos(categorySeq.incrementAndGet()));
         category.setMetadata(metadata);
 
         Category.CategorySpec categorySpec = new Category.CategorySpec();

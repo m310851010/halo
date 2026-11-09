@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.search.HaloDocument;
@@ -25,7 +26,10 @@ class LuceneSearchEngineTest {
 
     LuceneSearchEngine searchEngine;
 
-    @TempDir
+    // On Windows, Lucene 9 keeps mmapped segment files (_0.cfs) locked until GC, so JUnit
+    // cannot delete the temp directory right after the test. Skip the deletion instead of
+    // failing the test context teardown.
+    @TempDir(cleanup = CleanupMode.NEVER)
     Path tempDir;
 
     @BeforeEach

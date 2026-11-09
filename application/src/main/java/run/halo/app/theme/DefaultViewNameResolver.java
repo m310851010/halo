@@ -61,6 +61,12 @@ public class DefaultViewNameResolver implements ViewNameResolver {
         if (name.contains("..") || name.indexOf('\\') >= 0 || name.contains("::")) {
             return false;
         }
+        // Check leading slash explicitly so that the result is identical on every OS:
+        // on Windows, Path.of("/absolute").isAbsolute() is false (no drive letter), which
+        // would let leading-slash names through the safety check.
+        if (name.startsWith("/")) {
+            return false;
+        }
         try {
             return !Path.of(name).isAbsolute();
         } catch (InvalidPathException e) {
