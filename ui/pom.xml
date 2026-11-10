@@ -58,6 +58,11 @@
                         </goals>
                         <configuration>
                             <target>
+                                <!-- The pnpm launcher stores its downloaded native binary
+                                     inside the package dir (pnpm-native.exe). Re-extracting
+                                     the package on every build would drop it and force a
+                                     re-download from the (flaky) npm registry, so cache it
+                                     outside the package dir and restore it right after. -->
                                 <get src="${npm.registry}/pnpm/-/pnpm-${pnpm.version}.tgz"
                                      dest="${project.build.directory}/pnpm-${pnpm.version}.tgz"/>
                                 <untar src="${project.build.directory}/pnpm-${pnpm.version}.tgz"
@@ -67,12 +72,22 @@
                                 <move todir="${node.dir}/node_modules/pnpm">
                                     <fileset dir="${project.build.directory}/pnpm-tmp/package"/>
                                 </move>
+                                <copy todir="${node.dir}/node_modules/pnpm" overwrite="true"
+                                      failonerror="false">
+                                    <fileset dir="${node.dir}" includes="pnpm-native.exe.cached"/>
+                                </copy>
+                                <move file="${node.dir}/node_modules/pnpm/pnpm-native.exe.cached"
+                                      tofile="${node.dir}/node_modules/pnpm/pnpm-native.exe"
+                                      failonerror="false"/>
                                 <exec executable="${node.dir}/node.exe" dir="${project.basedir}"
                                       failonerror="true">
                                     <arg value="${node.dir}/node_modules/pnpm/bin/pnpm.mjs"/>
                                     <arg value="install"/>
                                     <env key="npm_config_registry" value="${npm.registry}"/>
                                 </exec>
+                                <copy file="${node.dir}/node_modules/pnpm/pnpm-native.exe"
+                                      tofile="${node.dir}/pnpm-native.exe.cached"
+                                      failonerror="false"/>
                             </target>
                         </configuration>
                     </execution>
