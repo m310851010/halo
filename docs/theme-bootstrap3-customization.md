@@ -378,14 +378,15 @@ Halo 登录密码是 **RSA(PKCS1) 加密后 Base64** 传输的，公钥内嵌在
 `const publicKey = "..."` 里（JSEncrypt 加密）。curl 自动化步骤：
 
 ```bash
-# 1. 拿 session + csrf
-curl -s -c jar http://localhost:8090/login > login.html
-CSRF=$(grep -oE 'name="_csrf" value="[^"]*"' login.html | sed 's/.*value="//;s/"//')
+# 1. 拿 session + csrf（临时文件统一放 D:/tmp，不要写到 C 盘）
+mkdir -p /d/tmp
+curl -s -c /d/tmp/halo-cookies.txt http://localhost:8090/login > /d/tmp/login.html
+CSRF=$(grep -oE 'name="_csrf" value="[^"]*"' /d/tmp/login.html | sed 's/.*value="//;s/"//')
 # 2. 提取公钥并用 node 加密密码
 PUB=$(grep -oE 'const publicKey = "[^"]*"' login.html | sed 's/.*= "//;s/"//;s#\\/#/#g')
 ENC=$(node -e "const c=require('crypto');const k=c.createPublicKey({key:Buffer.from('$PUB','base64'),format:'der',type:'spki'});console.log(c.publicEncrypt({key:k,padding:c.constants.RSA_PKCS1_PADDING},Buffer.from('你的密码')).toString('base64'))")
-# 3. 登录（302 到 /uc 即成功，SESSION 在 jar 里）
-curl -s -b jar -c jar -X POST http://localhost:8090/login \
+# 3. 登录（302 到 /uc 即成功，SESSION 在 /d/tmp/halo-cookies.txt 里）
+curl -s -b /d/tmp/halo-cookies.txt -c /d/tmp/halo-cookies.txt -X POST http://localhost:8090/login \
   -d "username=admin" --data-urlencode "password=$ENC" --data-urlencode "_csrf=$CSRF"
 ```
 
