@@ -59,21 +59,16 @@ git checkout -b feat/short-description
 
 Run relevant checks before opening a PR.
 
-Backend and general checks (including Spotless):
+> This fork builds with **Maven** (upstream uses Gradle). Spotless is no longer configured
+> here; keep formatting consistent with the surrounding code manually.
+
+Backend checks:
 
 ```bash
-./gradlew spotlessApply
-./gradlew spotlessCheck
-./gradlew clean check
+mvn test -pl api
+mvn test -pl application
+mvn package -DskipTests   # or run build-jar.bat / build-war.bat
 ```
-
-Install the pre-push hook once to run Spotless checks automatically before `git push`:
-
-```bash
-./gradlew spotlessInstallGitPrePushHook
-```
-
-If `spotlessCheck` fails, run `./gradlew spotlessApply`, review the formatting changes, and re-run checks.
 
 Frontend checks (in `ui`):
 
@@ -140,8 +135,8 @@ For detailed documentation, visit: https://github.com/Fission-AI/OpenSpec/tree/m
 
 - Follow the project coding style guide: <https://docs.halo.run/developer-guide/core/code-style>
 - Keep changes focused and avoid unrelated refactors in the same PR.
-- Run `./gradlew spotlessApply` before pushing changes outside `ui`.
-- Spotless does not format files under `ui`; continue to run frontend lint/typecheck/test commands there.
+- Keep Java formatting consistent with the surrounding code before pushing changes outside `ui`.
+- Frontend files under `ui` are not covered by any formatter here; continue to run frontend lint/typecheck/test commands there.
 
 ## Keep Your Fork Updated
 
