@@ -3,52 +3,89 @@
       xmlns:th="https://www.thymeleaf.org"
       th:replace="~{layout :: html(head = null, content = ~{::content})}">
 <th:block th:fragment="content">
-  <div class="panel panel-default" th:each="post : ${posts.items}">
-    <div class="panel-body">
-      <h2 class="media-heading theme-post-title">
-        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
-      </h2>
-      <p class="text-muted">
-        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-        <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd HH:mm')}"></time>
-        <span th:if="${post.spec.cover}" class="theme-tag-space"></span>
-        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"
-              th:if="${!#lists.isEmpty(post.categories)}"></span>
-        <a class="label label-primary theme-label"
-           th:each="category : ${post.categories}"
-           th:href="@{${category.status.permalink}}"
-           th:text="${category.spec.displayName}"></a>
+  <!-- 企业首页：横幅 / 产品分类 / 最新动态 / 关于我们，全部数据来自 CMS -->
+
+  <!-- 横幅 -->
+  <div class="theme-hero"
+       th:style="'background-image:url(' + ${theme.config.banner?.hero_image} + ')'">
+    <div class="theme-hero-inner">
+      <h1 th:text="${theme.config.banner?.hero_title} ?: ${site.title}"></h1>
+      <p th:text="${theme.config.banner?.hero_subtitle} ?: ${site.subtitle}"></p>
+      <p class="theme-hero-hotline">
+        <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
+        <span data-i18n-key="section.hotline">服务热线</span>：<strong th:text="${theme.config.banner?.hotline}"></strong>
       </p>
-      <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
-      <p>
-        <a class="btn btn-default btn-sm" th:href="@{${post.status.permalink}}">
-          阅读全文 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- 产品中心：分类列表（来自 CMS 分类数据） -->
+  <div class="theme-section" th:with="categories = ${categoryFinder.listAll()}">
+    <h2 class="theme-section-title">
+      <span data-i18n-key="section.products">产品中心</span>
+      <small>PRODUCTS</small>
+    </h2>
+    <div class="row">
+      <div class="col-md-3 col-sm-4 col-xs-6" th:each="category : ${categories}">
+        <a class="panel panel-default theme-cat-card"
+           th:href="@{${category.status.permalink}}">
+          <div class="panel-body">
+            <h4 th:text="${category.spec.displayName}"></h4>
+            <p class="text-muted" th:text="${category.spec.description}"></p>
+            <p class="text-muted">
+              <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+              <span th:text="${category.postCount} + ' 个产品'"></span>
+            </p>
+          </div>
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最新动态：文章列表（来自 CMS 文章数据） -->
+  <div class="theme-section" th:with="postsResult = ${postFinder.list(1, 6)}">
+    <h2 class="theme-section-title">
+      <span data-i18n-key="section.news">新闻资讯</span>
+      <small>NEWS</small>
+    </h2>
+    <div class="row">
+      <div class="col-md-4 col-sm-6" th:each="post : ${postsResult.items}">
+        <div class="panel panel-default theme-news-card">
+          <a th:href="@{${post.status.permalink}}">
+            <img class="img-responsive theme-news-cover"
+                 th:if="${post.spec.cover != null}"
+                 th:src="${post.spec.cover}" th:alt="${post.spec.title}"/>
+          </a>
+          <div class="panel-body">
+            <h4 class="theme-post-title">
+              <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
+            </h4>
+            <p class="text-muted">
+              <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+              <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"></time>
+            </p>
+            <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+      <p class="text-center">
+        <a class="btn btn-default" th:href="@{${site.routes.archivesUri}}" data-i18n-key="section.more">更多动态</a>
       </p>
-    </div>
   </div>
 
-  <div class="panel panel-default" th:if="${#lists.isEmpty(posts.items)}">
-    <div class="panel-body text-center text-muted">
-      还没有发布任何文章。
+  <!-- 关于我们：单页面内容（来自 CMS 页面数据） -->
+  <div class="theme-section" th:with="aboutContent = ${singlePageFinder.content('about-us')}">
+    <h2 class="theme-section-title">
+      <span data-i18n-key="section.about">关于杰佳创</span>
+      <small>ABOUT US</small>
+    </h2>
+    <div class="panel panel-default">
+      <div class="panel-body theme-content theme-about"
+           th:utext="${aboutContent != null ? aboutContent.content : '请到后台创建名为 about-us 的单页面'}"></div>
+      <div class="panel-footer text-center">
+        <a th:href="@{/about-us}">查看完整介绍</a>
+      </div>
     </div>
   </div>
-
-  <nav class="text-center" aria-label="分页">
-    <ul class="pagination">
-      <li th:if="${posts.hasPrevious()}">
-        <a th:href="@{${posts.prevUrl}}" aria-label="上一页">&laquo; 上一页</a>
-      </li>
-      <li class="disabled" th:unless="${posts.hasPrevious()}">
-        <span>&laquo; 上一页</span>
-      </li>
-      <li th:if="${posts.hasNext()}">
-        <a th:href="@{${posts.nextUrl}}" aria-label="下一页">下一页 &raquo;</a>
-      </li>
-      <li class="disabled" th:unless="${posts.hasNext()}">
-        <span>下一页 &raquo;</span>
-      </li>
-    </ul>
-  </nav>
 </th:block>
 </html>

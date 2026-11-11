@@ -14,7 +14,7 @@
     <th:block th:replace="${head}"/>
   </th:block>
 </head>
-<body>
+<body th:attr="data-i18n-base=${theme.config.i18n?.strings}">
 <nav class="navbar navbar-static-top"
      th:classappend="${theme.config.header?.navbar_style} ?: 'navbar-inverse'">
   <div class="container">
@@ -27,12 +27,26 @@
       </button>
       <a class="navbar-brand" th:href="@{/}" th:text="${site.title}"></a>
     </div>
-    <div class="collapse navbar-collapse" id="theme-navbar">
+    <!-- 导航菜单从 CMS 的 primary 菜单读取；语言切换按钮由 JS 控制 -->
+    <div class="collapse navbar-collapse" id="theme-navbar"
+         th:with="primaryMenu = ${menuFinder.getByName('primary')}">
       <ul class="nav navbar-nav navbar-right">
-        <li><a th:href="@{/}">首页</a></li>
-        <li><a th:href="@{${site.routes.categoriesUri}}">分类</a></li>
-        <li><a th:href="@{${site.routes.tagsUri}}">标签</a></li>
-        <li><a th:href="@{${site.routes.archivesUri}}">归档</a></li>
+        <li th:each="item : ${primaryMenu?.menuItems}">
+          <a th:href="@{${item.status.href}}" th:text="${item.status.displayName}"
+             th:attr="data-i18n-key=${'menu.' + item.status.displayName},target=${item.spec.target != null ? item.spec.target : null}"></a>
+        </li>
+        <li class="dropdown theme-lang">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+             aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+            <span class="theme-lang-current">中文</span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="theme-lang-pick" data-lang="zh-CN">中文</a></li>
+            <li><a href="#" class="theme-lang-pick" data-lang="en">English</a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </div>
@@ -45,13 +59,27 @@
     </div>
     <div class="col-md-3 col-sm-12 theme-sidebar">
       <div class="panel panel-default">
-        <div class="panel-heading">站点信息</div>
-        <div class="panel-body">
+        <div class="panel-heading" data-i18n-key="sidebar.contact">联系我们</div>
+        <div class="panel-body theme-contact-mini">
           <p>
-            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-            <a th:href="@{${site.url}}" th:text="${site.title}"></a>
+            <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
+            <a th:href="'tel:' + ${#strings.replace(theme.config.footer?.mobile ?: '', ' ', '')}"
+               th:text="${theme.config.footer?.mobile}"></a>
           </p>
-          <p th:if="${site.subtitle}" th:text="${site.subtitle}"></p>
+          <p>
+            <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
+            <span th:text="${theme.config.footer?.phone}"></span>
+          </p>
+          <p>
+            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+            <a th:href="'mailto:' + ${theme.config.footer?.email ?: ''}"
+               th:text="${theme.config.footer?.email}"></a>
+          </p>
+          <p>
+            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+            <span data-i18n-key="sidebar.address"
+                  th:text="${theme.config.footer?.address}"></span>
+          </p>
         </div>
       </div>
     </div>
@@ -62,12 +90,13 @@
   <div class="container text-center">
     <p th:utext="${theme.config.general?.footer_text} ?: '由 &lt;a href=&quot;https://www.halo.run&quot;&gt;Halo&lt;/a&gt; 强力驱动'"></p>
     <p>
-      <small th:text="'Halo ' + ${site.version} + ' · Bootstrap 3 主题'"></small>
+      <small th:text="${site.title} + ' © ' + ${#temporals.format(#temporals.createNow(), 'yyyy')}"></small>
     </p>
   </div>
 </footer>
 
 <script th:src="@{/assets/js/jquery.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.min.js}"></script>
+<script th:src="@{/assets/js/i18n.js?v={v}(v=${theme.spec.version})}"></script>
 </body>
 </html>

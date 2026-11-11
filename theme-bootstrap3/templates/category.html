@@ -3,37 +3,45 @@
       xmlns:th="https://www.thymeleaf.org"
       th:replace="~{layout :: html(head = null, content = ~{::content})}">
 <th:block th:fragment="content">
-  <ol class="breadcrumb">
-    <li><a th:href="@{${site.routes.categoriesUri}}">分类</a></li>
-    <li class="active" th:text="${category.spec.displayName}"></li>
-  </ol>
-  <div class="panel panel-default" th:each="post : ${posts.items}">
+  <!-- 产品中心：左侧分类列表，右侧当前分类的产品卡片网格 -->
+  <div class="panel panel-default">
+    <div class="panel-heading" th:text="${category != null} ? ${category.spec.displayName} : '产品中心'"></div>
     <div class="panel-body">
-      <h2 class="theme-post-title">
-        <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
-      </h2>
-      <p class="text-muted">
-        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-        <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd HH:mm')}"></time>
-      </p>
-      <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
+      <!-- 分类导航 -->
+      <div class="theme-cat-nav">
+        <a class="label theme-cat-pill"
+           th:each="c : ${categoryFinder.listAll()}"
+           th:href="@{${c.status.permalink}}"
+           th:classappend="${category != null && c.metadata.name == category.metadata.name} ? 'label-primary' : 'label-default'"
+           th:text="${c.spec.displayName}"></a>
+      </div>
+      <hr/>
+      <!-- 产品卡片网格 -->
+      <div class="row">
+        <div class="col-md-3 col-sm-4 col-xs-6" th:each="post : ${posts.items}">
+          <a class="panel panel-default theme-product-card" th:href="@{${post.status.permalink}}">
+            <div class="theme-product-img">
+              <img class="img-responsive" th:if="${post.spec.cover != null}"
+                   th:src="${post.spec.cover}" th:alt="${post.spec.title}"
+                   th:attr="loading='lazy'"/>
+              <span class="glyphicon glyphicon-picture theme-noimg" th:if="${post.spec.cover == null}"></span>
+            </div>
+            <div class="panel-body text-center">
+              <span class="theme-product-title" th:text="${post.spec.title}"></span>
+            </div>
+          </a>
+        </div>
+      </div>
+      <p class="text-center text-muted" data-i18n-key="section.noProducts" th:if="${#lists.isEmpty(posts.items)}">该分类下暂无产品。</p>
+    </div>
+    <div class="panel-footer text-center">
+      <ul class="pagination theme-pagination-none" style="margin:0">
+        <li th:if="${posts.hasPrevious()}"><a th:href="@{${posts.prevUrl}}">&laquo;</a></li>
+        <li class="disabled" th:unless="${posts.hasPrevious()}"><span>&laquo;</span></li>
+        <li th:if="${posts.hasNext()}"><a th:href="@{${posts.nextUrl}}">&raquo;</a></li>
+        <li class="disabled" th:unless="${posts.hasNext()}"><span>&raquo;</span></li>
+      </ul>
     </div>
   </div>
-  <nav class="text-center" aria-label="分页">
-    <ul class="pagination">
-      <li th:if="${posts.hasPrevious()}">
-        <a th:href="@{${posts.prevUrl}}">&laquo; 上一页</a>
-      </li>
-      <li class="disabled" th:unless="${posts.hasPrevious()}">
-        <span>&laquo; 上一页</span>
-      </li>
-      <li th:if="${posts.hasNext()}">
-        <a th:href="@{${posts.nextUrl}}">下一页 &raquo;</a>
-      </li>
-      <li class="disabled" th:unless="${posts.hasNext()}">
-        <span>下一页 &raquo;</span>
-      </li>
-    </ul>
-  </nav>
 </th:block>
 </html>

@@ -97,3 +97,138 @@ body {
 .panel {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
+
+/* 企业首页：横幅 / 分类卡片 / 新闻卡片 */
+.theme-hero {
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  margin-bottom: 24px;
+}
+
+.theme-hero-inner {
+  padding: 90px 20px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.theme-hero-inner h1 {
+  font-size: 34px;
+  margin: 0 0 10px;
+}
+
+.theme-hero-inner p {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.theme-hero-hotline strong {
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.theme-section {
+  margin-bottom: 36px;
+}
+
+.theme-section-title {
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.theme-section-title span {
+  font-size: 22px;
+}
+
+.theme-section-title small {
+  color: #999;
+  margin-left: 8px;
+  letter-spacing: 2px;
+}
+
+.theme-cat-card {
+  display: block;
+  color: #333;
+  text-decoration: none;
+  min-height: 130px;
+}
+
+.theme-cat-card:hover {
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-cat-card h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.theme-news-card img {
+  height: 170px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.theme-news-card h4 {
+  margin: 4px 0 8px;
+  font-size: 16px;
+}
+
+.theme-about {
+  max-height: 260px;
+  overflow: hidden;
+}
+
+/* 产品卡片网格（分类页/产品中心） */
+.theme-cat-nav {
+  margin-bottom: 14px;
+}
+
+.theme-cat-pill {
+  font-size: 13px;
+  padding: 7px 12px;
+  margin: 3px 4px 3px 0;
+  display: inline-block;
+}
+
+.theme-product-card {
+  display: block;
+  margin-bottom: 16px;
+  color: #333;
+  text-decoration: none;
+  height: 100%;
+}
+
+.theme-product-card:hover {
+  text-decoration: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.theme-product-img {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.theme-product-img img {
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.theme-noimg {
+  font-size: 42px;
+  color: #ccc;
+}
+
+.theme-product-title {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 40px;
+}

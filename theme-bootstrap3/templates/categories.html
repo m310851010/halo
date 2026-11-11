@@ -3,17 +3,27 @@
       xmlns:th="https://www.thymeleaf.org"
       th:replace="~{layout :: html(head = null, content = ~{::content})}">
 <th:block th:fragment="content">
+  <!-- 产品中心总览：全部分类的封面卡片 -->
   <div class="panel panel-default">
-    <div class="panel-heading">分类目录</div>
+    <div class="panel-heading"><span data-i18n-key="page.categoriesTitle">产品中心</span> <small>PRODUCTS</small></div>
     <div class="panel-body">
-      <div class="list-group">
-        <a class="list-group-item"
-           th:each="category : ${categories}"
-           th:href="@{${category.status.permalink}}">
-          <span class="badge" th:text="${category.postCount}"></span>
-          <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-          <span th:text="${category.spec.displayName}"></span>
-        </a>
+      <div class="row">
+        <div class="col-md-3 col-sm-4 col-xs-6" th:each="category : ${categories}">
+          <a class="panel panel-default theme-product-card" th:href="@{${category.status.permalink}}">
+            <div class="theme-product-img">
+              <img class="img-responsive" th:if="${category.spec.cover != null}"
+                   th:src="${category.spec.cover}" th:alt="${category.spec.displayName}"
+                   th:attr="loading='lazy'"/>
+              <span class="glyphicon glyphicon-th-large theme-noimg" th:if="${category.spec.cover == null}"></span>
+            </div>
+            <div class="panel-body text-center">
+              <span class="theme-product-title" th:text="${category.spec.displayName}"></span>
+              <p class="text-muted" style="margin-bottom:0">
+                <small th:text="${category.postCount} + ' 个产品'"></small>
+              </p>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </div>

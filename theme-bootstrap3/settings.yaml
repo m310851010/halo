@@ -4,6 +4,24 @@ metadata:
   name: theme-bootstrap3-setting
 spec:
   forms:
+    - group: banner
+      label: 首页横幅
+      formSchema:
+        - $formkit: attachment
+          name: hero_image
+          label: 横幅大图
+        - $formkit: text
+          name: hero_title
+          label: 主标题
+          value: "佛山杰佳创机电科技有限公司"
+        - $formkit: text
+          name: hero_subtitle
+          label: 副标题
+          value: "成立于 2011 年 · IMI NORGREN 授权经销商 · 深耕食品饮料行业"
+        - $formkit: text
+          name: hotline
+          label: 服务热线
+          value: "13516508905 / 13702625802"
     - group: general
       label: 通用
       formSchema:
@@ -28,3 +46,30 @@ spec:
               value: navbar-inverse
             - label: 浅色（默认）
               value: navbar-default
+    - group: footer
+      label: 页脚联系信息
+      formSchema:
+        - $formkit: text
+          name: address
+          label: 公司地址
+          value: "广东省佛山市南海区罗村桂丹路华泓商业城305B"
+        - $formkit: text
+          name: phone
+          label: 电话
+          value: "0757-81809551"
+        - $formkit: text
+          name: mobile
+          label: 手机
+          value: "+86 (0) 135 1650 8905"
+        - $formkit: text
+          name: email
+          label: 邮箱
+          value: "salesjjt@163.com"
+    - group: i18n
+      label: 多语言（i18n）
+      formSchema:
+        - $formkit: textarea
+          name: strings
+          label: 自定义翻译（JSON，可选）
+          help: 格式 {"菜单项名":{"zh-CN":"中文","en":"English"}}；留空使用内置翻译
+          rows: 6
