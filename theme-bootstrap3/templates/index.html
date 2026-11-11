@@ -9,23 +9,24 @@
   <div class="theme-hero"
        th:style="'background-image:url(' + ${theme.config.banner?.hero_image} + ')'">
     <div class="theme-hero-inner">
-      <h1 th:text="${theme.config.banner?.hero_title} ?: ${site.title}"></h1>
-      <p th:text="${theme.config.banner?.hero_subtitle} ?: ${site.subtitle}"></p>
+      <h1 th:text="${isEn ? (I?.hero_title_en ?: site.title) : (theme.config.banner?.hero_title ?: site.title)}"></h1>
+      <p th:text="${isEn ? (I?.hero_subtitle_en ?: site.subtitle) : (theme.config.banner?.hero_subtitle ?: site.subtitle)}"></p>
       <p class="theme-hero-hotline">
         <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
-        <span data-i18n-key="section.hotline">服务热线</span>：<strong th:text="${theme.config.banner?.hotline}"></strong>
+        <span th:text="${I?.hotline_label}"></span>：<strong th:text="${theme.config.banner?.hotline}"></strong>
       </p>
     </div>
   </div>
 
-  <!-- 产品中心：分类列表（来自 CMS 分类数据） -->
-  <div class="theme-section" th:with="categories = ${categoryFinder.listAll()}">
+  <!-- 产品中心：分类列表（英文模式读取 -en 分类） -->
+  <div class="theme-section"
+       th:with="showCats = ${isEn ? enCats : zhCats}">
     <h2 class="theme-section-title">
-      <span data-i18n-key="section.products">产品中心</span>
+      <span th:text="${I?.products_title}"></span>
       <small>PRODUCTS</small>
     </h2>
     <div class="row">
-      <div class="col-md-3 col-sm-4 col-xs-6" th:each="category : ${categories}">
+      <div class="col-md-3 col-sm-4 col-xs-6" th:each="category : ${showCats}">
         <a class="panel panel-default theme-cat-card"
            th:href="@{${category.status.permalink}}">
           <div class="panel-body">
@@ -33,27 +34,32 @@
             <p class="text-muted" th:text="${category.spec.description}"></p>
             <p class="text-muted">
               <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
-              <span th:text="${category.postCount} + ' 个产品'"></span>
+              <span th:text="${category.postCount} + ' ' + ${I?.product_count_suffix}"></span>
             </p>
           </div>
         </a>
       </div>
     </div>
+    <p class="text-center">
+      <a class="btn btn-default" th:href="@{/categories}" th:text="${I?.view_all_products}"></a>
+    </p>
   </div>
 
-  <!-- 最新动态：文章列表（来自 CMS 文章数据） -->
-  <div class="theme-section" th:with="postsResult = ${postFinder.list(1, 6)}">
+  <!-- 最新动态：文章列表（英文模式读 news-en 分类） -->
+  <th:block th:with="newsCat = ${isEn ? enNewsCat[0] : zhNewsCat[0]}">
+    <th:block th:with="postsResult = ${postFinder.listByCategory(1, 6, newsCat.metadata.name)}">
     <h2 class="theme-section-title">
-      <span data-i18n-key="section.news">新闻资讯</span>
+      <span th:text="${I?.news_title}"></span>
       <small>NEWS</small>
     </h2>
-    <div class="row">
+    <div class="row" th:if="${postsResult != null}">
       <div class="col-md-4 col-sm-6" th:each="post : ${postsResult.items}">
         <div class="panel panel-default theme-news-card">
           <a th:href="@{${post.status.permalink}}">
             <img class="img-responsive theme-news-cover"
                  th:if="${post.spec.cover != null}"
-                 th:src="${post.spec.cover}" th:alt="${post.spec.title}"/>
+                 th:src="${post.spec.cover}" th:alt="${post.spec.title}"
+                 th:attr="loading='lazy'"/>
           </a>
           <div class="panel-body">
             <h4 class="theme-post-title">
@@ -68,24 +74,28 @@
         </div>
       </div>
     </div>
-      <p class="text-center">
-        <a class="btn btn-default" th:href="@{${site.routes.archivesUri}}" data-i18n-key="section.more">更多动态</a>
-      </p>
+    <p class="text-center">
+      <a class="btn btn-default" th:href="@{${site.routes.archivesUri}}" th:text="${I?.more_news}"></a>
+    </p>
   </div>
+  </th:block>
+  </th:block>
 
-  <!-- 关于我们：单页面内容（来自 CMS 页面数据） -->
-  <div class="theme-section" th:with="aboutContent = ${singlePageFinder.content('about-us')}">
+  <!-- 关于我们：单页面内容（按语言取 about-us / about-us-en） -->
+  <div class="theme-section" th:with="aboutName = ${isEn ? 'about-us-en' : 'about-us'}">
+    <th:block th:with="aboutContent = ${singlePageFinder.content(aboutName)}">
     <h2 class="theme-section-title">
-      <span data-i18n-key="section.about">关于杰佳创</span>
+      <span th:text="${I?.about_title}"></span>
       <small>ABOUT US</small>
     </h2>
     <div class="panel panel-default">
       <div class="panel-body theme-content theme-about"
-           th:utext="${aboutContent != null ? aboutContent.content : '请到后台创建名为 about-us 的单页面'}"></div>
+           th:utext="${aboutContent != null ? aboutContent.content : ''}"></div>
       <div class="panel-footer text-center">
-        <a th:href="@{/about-us}">查看完整介绍</a>
+        <a th:href="@{'/' + aboutName}" th:text="${I?.view_profile}"></a>
       </div>
     </div>
   </div>
+  </th:block>
 </th:block>
 </html>

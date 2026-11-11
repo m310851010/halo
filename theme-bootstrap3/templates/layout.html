@@ -14,8 +14,15 @@
     <th:block th:replace="${head}"/>
   </th:block>
 </head>
-<body th:attr="data-i18n-base=${theme.config.i18n?.strings}">
-<nav class="navbar navbar-static-top"
+<!-- 语言判定顺序（Halo 原生）：?language= 参数 > language cookie > 用户设置 > 浏览器 Accept-Language -->
+<body th:with="isEn=${#locale.language == 'en'},
+                 I = ${theme.config.i18n},
+                 primaryMenu = ${menuFinder.getByName(isEn ? 'primary-en' : 'primary')}">
+<th:block th:with="allCats = ${categoryFinder.listAll()},
+                     zhCats = ${allCats.?[spec.slug != null && !spec.slug.endsWith('-en')]},
+                     enCats = ${allCats.?[spec.slug != null && spec.slug.endsWith('-en')]},
+                     zhNewsCat = ${allCats.?[spec.slug == 'news']},
+                     enNewsCat = ${allCats.?[spec.slug == 'news-en']}"><nav class="navbar navbar-static-top"
      th:classappend="${theme.config.header?.navbar_style} ?: 'navbar-inverse'">
   <div class="container">
     <div class="navbar-header">
@@ -27,24 +34,23 @@
       </button>
       <a class="navbar-brand" th:href="@{/}" th:text="${site.title}"></a>
     </div>
-    <!-- 导航菜单从 CMS 的 primary 菜单读取；语言切换按钮由 JS 控制 -->
-    <div class="collapse navbar-collapse" id="theme-navbar"
-         th:with="primaryMenu = ${menuFinder.getByName('primary')}">
+    <!-- 导航菜单按语言读取 primary / primary-en（CMS 菜单，后台可编辑） -->
+    <div class="collapse navbar-collapse" id="theme-navbar">
       <ul class="nav navbar-nav navbar-right">
         <li th:each="item : ${primaryMenu?.menuItems}">
           <a th:href="@{${item.status.href}}" th:text="${item.status.displayName}"
-             th:attr="data-i18n-key=${'menu.' + item.status.displayName},target=${item.spec.target != null ? item.spec.target : null}"></a>
+             th:attr="target=${item.spec.target != null ? item.spec.target : null}"></a>
         </li>
         <li class="dropdown theme-lang">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
              aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-            <span class="theme-lang-current">中文</span>
+            <span th:text="${isEn ? 'English' : '中文'}"></span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="#" class="theme-lang-pick" data-lang="zh-CN">中文</a></li>
-            <li><a href="#" class="theme-lang-pick" data-lang="en">English</a></li>
+            <li th:if="${isEn}"><a href="#" onclick="setLang('zh-CN')">中文</a></li>
+            <li th:unless="${isEn}"><a href="#" onclick="setLang('en')">English</a></li>
           </ul>
         </li>
       </ul>
@@ -59,7 +65,7 @@
     </div>
     <div class="col-md-3 col-sm-12 theme-sidebar">
       <div class="panel panel-default">
-        <div class="panel-heading" data-i18n-key="sidebar.contact">联系我们</div>
+        <div class="panel-heading" th:text="${isEn ? I?.contact_en : I?.contact_zh}"></div>
         <div class="panel-body theme-contact-mini">
           <p>
             <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
@@ -77,8 +83,7 @@
           </p>
           <p>
             <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-            <span data-i18n-key="sidebar.address"
-                  th:text="${theme.config.footer?.address}"></span>
+            <span th:text="${isEn ? I?.address_en : I?.address_zh}"></span>
           </p>
         </div>
       </div>
@@ -88,7 +93,7 @@
 
 <footer class="theme-footer">
   <div class="container text-center">
-    <p th:utext="${theme.config.general?.footer_text} ?: '由 &lt;a href=&quot;https://www.halo.run&quot;&gt;Halo&lt;/a&gt; 强力驱动'"></p>
+    <p th:utext="${isEn ? I?.footer_text_en : theme.config.general?.footer_text}"></p>
     <p>
       <small th:text="${site.title} + ' © ' + ${#temporals.format(#temporals.createNow(), 'yyyy')}"></small>
     </p>
@@ -97,6 +102,12 @@
 
 <script th:src="@{/assets/js/jquery.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.min.js}"></script>
-<script th:src="@{/assets/js/i18n.js?v={v}(v=${theme.spec.version})}"></script>
+<script th:inline="javascript">
+  function setLang(lang) {
+    document.cookie = 'language=' + lang + ';path=/;max-age=31536000';
+    location.reload();
+  }
+</script>
+</th:block>
 </body>
 </html>

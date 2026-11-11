@@ -3,14 +3,14 @@
       xmlns:th="https://www.thymeleaf.org"
       th:replace="~{layout :: html(head = null, content = ~{::content})}">
 <th:block th:fragment="content">
-  <!-- 产品中心：左侧分类列表，右侧当前分类的产品卡片网格 -->
+  <!-- 分类页：左侧当前语言分类导航，右侧产品卡片网格 -->
   <div class="panel panel-default">
-    <div class="panel-heading" th:text="${category != null} ? ${category.spec.displayName} : '产品中心'"></div>
+    <div class="panel-heading" th:text="${category != null} ? ${category.spec.displayName} : ''"></div>
     <div class="panel-body">
-      <!-- 分类导航 -->
+      <!-- 当前语言的分类导航 -->
       <div class="theme-cat-nav">
         <a class="label theme-cat-pill"
-           th:each="c : ${categoryFinder.listAll()}"
+           th:each="c : ${isEn ? enCats : zhCats}"
            th:href="@{${c.status.permalink}}"
            th:classappend="${category != null && c.metadata.name == category.metadata.name} ? 'label-primary' : 'label-default'"
            th:text="${c.spec.displayName}"></a>
@@ -32,7 +32,8 @@
           </a>
         </div>
       </div>
-      <p class="text-center text-muted" data-i18n-key="section.noProducts" th:if="${#lists.isEmpty(posts.items)}">该分类下暂无产品。</p>
+      <p class="text-center text-muted" th:if="${#lists.isEmpty(posts.items)}"
+         th:text="${I?.no_products}"></p>
     </div>
     <div class="panel-footer text-center">
       <ul class="pagination theme-pagination-none" style="margin:0">
