@@ -6,7 +6,7 @@
   <!-- 产品中心总览：当前语言的分类封面卡片 -->
   <div class="panel panel-default">
     <div class="panel-heading">
-      <span th:text="${I?.products_title}"></span> <small>PRODUCTS</small>
+      <span th:text="#{section.products}"></span> <small>PRODUCTS</small>
     </div>
     <div class="panel-body">
       <div class="row">
@@ -22,7 +22,7 @@
             <div class="panel-body text-center">
               <span class="theme-product-title" th:text="${category.spec.displayName}"></span>
               <p class="text-muted" style="margin-bottom:0">
-                <small th:text="${category.postCount} + ' ' + ${I?.product_count_suffix}"></small>
+                <small th:text="${category.postCount} + ' ' + #{section.productCountSuffix}"></small>
               </p>
             </div>
           </a>

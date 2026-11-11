@@ -5,24 +5,30 @@
 <th:block th:fragment="content">
   <!-- 企业首页：横幅 / 产品分类 / 最新动态 / 关于我们，全部数据来自 CMS -->
 
-  <!-- 横幅 -->
+  <!-- 横幅（双语字段按语言渲染） -->
   <div class="theme-hero"
        th:style="'background-image:url(' + ${theme.config.banner?.hero_image} + ')'">
     <div class="theme-hero-inner">
-      <h1 th:text="${isEn ? (I?.hero_title_en ?: site.title) : (theme.config.banner?.hero_title ?: site.title)}"></h1>
-      <p th:text="${isEn ? (I?.hero_subtitle_en ?: site.subtitle) : (theme.config.banner?.hero_subtitle ?: site.subtitle)}"></p>
+      <h1 th:text="${isEn ? B?.hero_title_en : B?.hero_title_zh}"></h1>
+      <p th:text="${isEn ? B?.hero_subtitle_en : B?.hero_subtitle_zh}"></p>
       <p class="theme-hero-hotline">
         <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
-        <span th:text="${I?.hotline_label}"></span>：<strong th:text="${theme.config.banner?.hotline}"></strong>
+        <span th:text="#{section.hotline}"></span>：
+        <strong th:text="${B?.hotline_number}"></strong>
       </p>
     </div>
   </div>
 
   <!-- 产品中心：分类列表（英文模式读取 -en 分类） -->
-  <div class="theme-section"
-       th:with="showCats = ${isEn ? enCats : zhCats}">
+  <!-- 注意：layout body 的 th:with 变量对 content fragment 不可见，分类集合在此自算 -->
+  <th:block th:with="allCats = ${categoryFinder.listAll()},
+                       zhCats = ${allCats.?[spec.slug != null && !spec.slug.endsWith('-en')]},
+                       enCats = ${allCats.?[spec.slug != null && spec.slug.endsWith('-en')]},
+                       zhNewsCat = ${allCats.?[spec.slug == 'news']},
+                       enNewsCat = ${allCats.?[spec.slug == 'news-en']}">
+  <div class="theme-section" th:with="showCats = ${isEn ? enCats : zhCats}">
     <h2 class="theme-section-title">
-      <span th:text="${I?.products_title}"></span>
+      <span th:text="#{section.products}"></span>
       <small>PRODUCTS</small>
     </h2>
     <div class="row">
@@ -34,68 +40,71 @@
             <p class="text-muted" th:text="${category.spec.description}"></p>
             <p class="text-muted">
               <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
-              <span th:text="${category.postCount} + ' ' + ${I?.product_count_suffix}"></span>
+              <span th:text="${category.postCount} + ' ' + #{section.productCountSuffix}"></span>
             </p>
           </div>
         </a>
       </div>
     </div>
     <p class="text-center">
-      <a class="btn btn-default" th:href="@{/categories}" th:text="${I?.view_all_products}"></a>
+      <a class="btn btn-default" th:href="@{/categories}"
+         th:text="#{page.allProducts}"></a>
     </p>
   </div>
 
   <!-- 最新动态：文章列表（英文模式读 news-en 分类） -->
   <th:block th:with="newsCat = ${isEn ? enNewsCat[0] : zhNewsCat[0]}">
     <th:block th:with="postsResult = ${postFinder.listByCategory(1, 6, newsCat.metadata.name)}">
-    <h2 class="theme-section-title">
-      <span th:text="${I?.news_title}"></span>
-      <small>NEWS</small>
-    </h2>
-    <div class="row" th:if="${postsResult != null}">
-      <div class="col-md-4 col-sm-6" th:each="post : ${postsResult.items}">
-        <div class="panel panel-default theme-news-card">
-          <a th:href="@{${post.status.permalink}}">
-            <img class="img-responsive theme-news-cover"
-                 th:if="${post.spec.cover != null}"
-                 th:src="${post.spec.cover}" th:alt="${post.spec.title}"
-                 th:attr="loading='lazy'"/>
-          </a>
-          <div class="panel-body">
-            <h4 class="theme-post-title">
-              <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
-            </h4>
-            <p class="text-muted">
-              <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-              <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"></time>
-            </p>
-            <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
+      <div class="theme-section">
+        <h2 class="theme-section-title">
+          <span th:text="#{section.news}"></span>
+          <small>NEWS</small>
+        </h2>
+        <div class="row">
+          <div class="col-md-4 col-sm-6" th:each="post : ${postsResult.items}">
+            <div class="panel panel-default theme-news-card">
+              <a th:href="@{${post.status.permalink}}">
+                <img class="img-responsive theme-news-cover"
+                     th:if="${post.spec.cover != null}"
+                     th:src="${post.spec.cover}" th:alt="${post.spec.title}"
+                     th:attr="loading='lazy'"/>
+              </a>
+              <div class="panel-body">
+                <h4 class="theme-post-title">
+                  <a th:href="@{${post.status.permalink}}" th:text="${post.spec.title}"></a>
+                </h4>
+                <p class="text-muted">
+                  <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                  <time th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}"></time>
+                </p>
+                <p class="theme-excerpt" th:text="${post.status.excerpt}"></p>
+              </div>
+            </div>
           </div>
         </div>
+        <p class="text-center">
+          <a class="btn btn-default" th:href="@{${site.routes.archivesUri}}"
+             th:text="#{section.more}"></a>
+        </p>
       </div>
-    </div>
-    <p class="text-center">
-      <a class="btn btn-default" th:href="@{${site.routes.archivesUri}}" th:text="${I?.more_news}"></a>
-    </p>
-  </div>
-  </th:block>
+    </th:block>
   </th:block>
 
   <!-- 关于我们：单页面内容（按语言取 about-us / about-us-en） -->
   <div class="theme-section" th:with="aboutName = ${isEn ? 'about-us-en' : 'about-us'}">
     <th:block th:with="aboutContent = ${singlePageFinder.content(aboutName)}">
-    <h2 class="theme-section-title">
-      <span th:text="${I?.about_title}"></span>
-      <small>ABOUT US</small>
-    </h2>
-    <div class="panel panel-default">
-      <div class="panel-body theme-content theme-about"
-           th:utext="${aboutContent != null ? aboutContent.content : ''}"></div>
-      <div class="panel-footer text-center">
-        <a th:href="@{'/' + aboutName}" th:text="${I?.view_profile}"></a>
+      <h2 class="theme-section-title">
+        <span th:text="#{section.about}"></span>
+        <small>ABOUT US</small>
+      </h2>
+      <div class="panel panel-default">
+        <div class="panel-body theme-content theme-about"
+             th:utext="${aboutContent != null ? aboutContent.content : ''}"></div>
+        <div class="panel-footer text-center">
+          <a th:href="@{'/' + aboutName}" th:text="#{section.viewAll}"></a>
+        </div>
       </div>
-    </div>
+    </th:block>
   </div>
-  </th:block>
 </th:block>
 </html>

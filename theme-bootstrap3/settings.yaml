@@ -4,55 +4,82 @@ metadata:
   name: theme-bootstrap3-setting
 spec:
   forms:
+    # ============================================================
+    # 站点固定"业务内容"：双语成对（_zh / _en），Console 可视化编辑。
+    # 纯界面 UI 文案（按钮/提示等）在模板 messages*.properties 中。
+    # ============================================================
+    - group: site
+      label: 站点信息（双语）
+      formSchema:
+        - $formkit: text
+          name: title_zh
+          label: 站点标题（中）
+          value: "佛山杰佳创机电科技有限公司"
+        - $formkit: text
+          name: title_en
+          label: 站点标题（英）
+          value: "Foshan JJT Electromechanical Technology Co., Ltd."
+        - $formkit: text
+          name: subtitle_zh
+          label: 站点副标题（中）
+          value: "IMI NORGREN 授权经销商 · 深耕食品饮料行业"
+        - $formkit: text
+          name: subtitle_en
+          label: 站点副标题（英）
+          value: "Authorized IMI NORGREN Distributor · Food & Beverage Industry"
+        - $formkit: text
+          name: logo_zh
+          label: Logo（中，可选）
+        - $formkit: text
+          name: logo_en
+          label: Logo（英，可选）
+
     - group: banner
-      label: 首页横幅
+      label: 首页横幅（双语）
       formSchema:
         - $formkit: attachment
           name: hero_image
           label: 横幅大图
         - $formkit: text
-          name: hero_title
-          label: 主标题
+          name: hero_title_zh
+          label: 横幅主标题（中）
           value: "佛山杰佳创机电科技有限公司"
         - $formkit: text
-          name: hero_subtitle
-          label: 副标题
+          name: hero_title_en
+          label: 横幅主标题（英）
+          value: "Foshan JJT Electromechanical Technology Co., Ltd."
+        - $formkit: text
+          name: hero_subtitle_zh
+          label: 横幅副标题（中）
           value: "成立于 2011 年 · IMI NORGREN 授权经销商 · 深耕食品饮料行业"
         - $formkit: text
-          name: hotline
-          label: 服务热线
+          name: hero_subtitle_en
+          label: 横幅副标题（英）
+          value: "Founded in 2011 · Authorized IMI NORGREN Distributor · Food & Beverage Industry"
+        - $formkit: text
+          name: hotline_number
+          label: 服务热线号码
           value: "13516508905 / 13702625802"
-    - group: general
-      label: 通用
+
+    - group: contact
+      label: 联系方式（双语）
       formSchema:
         - $formkit: text
-          name: footer_text
-          label: 页脚文字
-          placeholder: 支持任意 HTML
-          value: "由 <a href=\"https://www.halo.run\">Halo</a> 强力驱动"
-        - $formkit: checkbox
-          name: show_comment
-          label: 在文章底部显示评论区
-          value: true
-    - group: header
-      label: 顶部导航
-      formSchema:
-        - $formkit: select
-          name: navbar_style
-          label: 导航栏风格
-          value: navbar-inverse
-          options:
-            - label: 深色（反色）
-              value: navbar-inverse
-            - label: 浅色（默认）
-              value: navbar-default
-    - group: footer
-      label: 页脚联系信息
-      formSchema:
+          name: contact_title_zh
+          label: 侧栏标题（中）
+          value: "联系我们"
         - $formkit: text
-          name: address
-          label: 公司地址
+          name: contact_title_en
+          label: 侧栏标题（英）
+          value: "Contact Us"
+        - $formkit: text
+          name: address_zh
+          label: 公司地址（中）
           value: "广东省佛山市南海区罗村桂丹路华泓商业城305B"
+        - $formkit: text
+          name: address_en
+          label: 公司地址（英）
+          value: "Room 305B, Huahong Business City, Guidan Road, Luocun, Nanhai District, Foshan, Guangdong"
         - $formkit: text
           name: phone
           label: 电话
@@ -65,70 +92,60 @@ spec:
           name: email
           label: 邮箱
           value: "salesjjt@163.com"
-    - group: i18n
-      label: 多语言界面文案（i18n）
+
+    - group: sections
+      label: 首页区块标题（双语）
       formSchema:
         - $formkit: text
-          name: products_title
-          label: "「产品中心」标题"
+          name: products_title_zh
+          label: 「产品中心」（中）
           value: "产品中心"
         - $formkit: text
-          name: news_title
-          label: "「新闻资讯」标题"
+          name: products_title_en
+          label: 「产品中心」（英）
+          value: "Products"
+        - $formkit: text
+          name: news_title_zh
+          label: 「新闻资讯」（中）
           value: "新闻资讯"
         - $formkit: text
-          name: about_title
-          label: "「关于杰佳创」标题"
+          name: news_title_en
+          label: 「新闻资讯」（英）
+          value: "News"
+        - $formkit: text
+          name: about_title_zh
+          label: 「关于杰佳创」（中）
           value: "关于杰佳创"
         - $formkit: text
-          name: more_news
-          label: "「更多动态」按钮"
-          value: "更多动态"
+          name: about_title_en
+          label: 「关于杰佳创」（英）
+          value: "About JJT"
+
+    - group: general
+      label: 通用（双语）
+      formSchema:
         - $formkit: text
-          name: view_all_products
-          label: "「查看全部产品」按钮"
-          value: "查看全部产品"
-        - $formkit: text
-          name: view_profile
-          label: "「查看完整介绍」链接"
-          value: "查看完整介绍"
-        - $formkit: text
-          name: hotline_label
-          label: "「服务热线」标签"
-          value: "服务热线"
-        - $formkit: text
-          name: product_count_suffix
-          label: "产品数量后缀"
-          value: "个产品"
-        - $formkit: text
-          name: no_products
-          label: "「暂无产品」提示"
-          value: "该分类下暂无产品。"
-        - $formkit: text
-          name: contact_zh
-          label: "侧栏「联系我们」标题（中文）"
-          value: "联系我们"
-        - $formkit: text
-          name: contact_en
-          label: "侧栏「联系我们」标题（英文）"
-          value: "Contact Us"
-        - $formkit: text
-          name: address_zh
-          label: "公司地址（中文）"
-          value: "广东省佛山市南海区罗村桂丹路华泓商业城305B"
-        - $formkit: text
-          name: address_en
-          label: "公司地址（英文）"
-          value: "Room 305B, Huahong Business City, Guidan Road, Luocun, Nanhai District, Foshan, Guangdong"
-        - $formkit: text
-          name: hero_title_en
-          label: "首页横幅主标题（英文模式）"
-          value: "Foshan JJT Electromechanical Technology Co., Ltd."
-        - $formkit: text
-          name: hero_subtitle_en
-          label: "首页横幅副标题（英文模式）"
-          value: "Founded in 2011 · Authorized IMI NORGREN Distributor · Food & Beverage Industry"
+          name: footer_text_zh
+          label: 页脚文字（中，支持 HTML）
+          value: "Copyright © 佛山杰佳创机电科技有限公司"
         - $formkit: text
           name: footer_text_en
-          label: "页脚文字（英文模式，支持 HTML）"
+          label: 页脚文字（英，支持 HTML）
           value: "Copyright © Foshan JJT Electromechanical Technology Co., Ltd."
+        - $formkit: checkbox
+          name: show_comment
+          label: 在文章底部显示评论区
+          value: true
+
+    - group: header
+      label: 顶部导航
+      formSchema:
+        - $formkit: select
+          name: navbar_style
+          label: 导航栏风格
+          value: navbar-inverse
+          options:
+            - label: 深色（反色）
+              value: navbar-inverse
+            - label: 浅色（默认）
+              value: navbar-default

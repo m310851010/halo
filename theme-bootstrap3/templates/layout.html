@@ -14,15 +14,23 @@
     <th:block th:replace="${head}"/>
   </th:block>
 </head>
-<!-- 语言判定顺序（Halo 原生）：?language= 参数 > language cookie > 用户设置 > 浏览器 Accept-Language -->
+<!--
+  语言判定（Halo 原生 ThemeLocaleContextResolver 优先级）：
+  ?language= 参数 > language cookie > 登录用户语言 > 浏览器 Accept-Language。
+  站点固定内容（标题/联系/页脚/横幅/界面文案）全部来自主题设置的双语字段对
+  （xxx_zh / xxx_en），Console 可视化编辑；内容部分（文章/产品/页面）按语言
+  分两套由用户编辑。
+-->
 <body th:with="isEn=${#locale.language == 'en'},
-                 I = ${theme.config.i18n},
+                 S = ${theme.config.site},
+                 B = ${theme.config.banner},
+                 K = ${theme.config.contact},
+                 T = ${theme.config.sections},
+                 G = ${theme.config.general},
+                 siteTitle = ${isEn ? S?.title_en : S?.title_zh},
+                 siteSubtitle = ${isEn ? S?.subtitle_en : S?.subtitle_zh},
                  primaryMenu = ${menuFinder.getByName(isEn ? 'primary-en' : 'primary')}">
-<th:block th:with="allCats = ${categoryFinder.listAll()},
-                     zhCats = ${allCats.?[spec.slug != null && !spec.slug.endsWith('-en')]},
-                     enCats = ${allCats.?[spec.slug != null && spec.slug.endsWith('-en')]},
-                     zhNewsCat = ${allCats.?[spec.slug == 'news']},
-                     enNewsCat = ${allCats.?[spec.slug == 'news-en']}"><nav class="navbar navbar-static-top"
+<nav class="navbar navbar-static-top"
      th:classappend="${theme.config.header?.navbar_style} ?: 'navbar-inverse'">
   <div class="container">
     <div class="navbar-header">
@@ -32,9 +40,8 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" th:href="@{/}" th:text="${site.title}"></a>
+      <a class="navbar-brand" th:href="@{/}" th:text="${siteTitle}"></a>
     </div>
-    <!-- 导航菜单按语言读取 primary / primary-en（CMS 菜单，后台可编辑） -->
     <div class="collapse navbar-collapse" id="theme-navbar">
       <ul class="nav navbar-nav navbar-right">
         <li th:each="item : ${primaryMenu?.menuItems}">
@@ -65,25 +72,23 @@
     </div>
     <div class="col-md-3 col-sm-12 theme-sidebar">
       <div class="panel panel-default">
-        <div class="panel-heading" th:text="${isEn ? I?.contact_en : I?.contact_zh}"></div>
+        <div class="panel-heading" th:text="${isEn ? K?.contact_title_en : K?.contact_title_zh}"></div>
         <div class="panel-body theme-contact-mini">
           <p>
             <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
-            <a th:href="'tel:' + ${#strings.replace(theme.config.footer?.mobile ?: '', ' ', '')}"
-               th:text="${theme.config.footer?.mobile}"></a>
+            <a th:href="'tel:' + ${#strings.replace(K?.mobile ?: '', ' ', '')}" th:text="${K?.mobile}"></a>
           </p>
           <p>
             <span class="glyphicon glyphicon-earphone" aria-hidden="true"></span>
-            <span th:text="${theme.config.footer?.phone}"></span>
+            <span th:text="${K?.phone}"></span>
           </p>
           <p>
             <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
-            <a th:href="'mailto:' + ${theme.config.footer?.email ?: ''}"
-               th:text="${theme.config.footer?.email}"></a>
+            <a th:href="'mailto:' + ${K?.email ?: ''}" th:text="${K?.email}"></a>
           </p>
           <p>
             <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-            <span th:text="${isEn ? I?.address_en : I?.address_zh}"></span>
+            <span th:text="${isEn ? K?.address_en : K?.address_zh}"></span>
           </p>
         </div>
       </div>
@@ -93,21 +98,21 @@
 
 <footer class="theme-footer">
   <div class="container text-center">
-    <p th:utext="${isEn ? I?.footer_text_en : theme.config.general?.footer_text}"></p>
+    <p th:utext="${isEn ? G?.footer_text_en : G?.footer_text_zh}"></p>
     <p>
-      <small th:text="${site.title} + ' © ' + ${#temporals.format(#temporals.createNow(), 'yyyy')}"></small>
+      <small th:text="${siteTitle} + ' © ' + ${#temporals.format(#temporals.createNow(), 'yyyy')}"></small>
     </p>
   </div>
 </footer>
 
 <script th:src="@{/assets/js/jquery.min.js}"></script>
 <script th:src="@{/assets/js/bootstrap.min.js}"></script>
-<script th:inline="javascript">
+<script>
   function setLang(lang) {
     document.cookie = 'language=' + lang + ';path=/;max-age=31536000';
     location.reload();
   }
 </script>
-</th:block>
+
 </body>
 </html>
